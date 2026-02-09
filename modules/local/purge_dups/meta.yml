@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "purge_dups"
+description: Purge haplotigs and overlaps in an assembly based on read depth
+keywords:
+  - assembly
+  - purge
+  - haplotigs
+  - duplicates
+  - haplotype
+tools:
+  - "purge_dups":
+      description: "Purge haplotigs and overlaps in an assembly based on read depth"
+      homepage: "https://github.com/dfguan/purge_dups"
+      documentation: "https://github.com/dfguan/purge_dups"
+      tool_dev_url: "https://github.com/dfguan/purge_dups"
+      doi: "10.1093/bioinformatics/btaa025"
+      licence: "['MIT']"
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - assembly:
+        type: file
+        description: Assembly in FASTA format
+        pattern: "*.{fa,fasta}"
+    - reads:
+        type: file
+        description: PacBio HiFi reads in FASTQ format
+        pattern: "*.{fastq,fq}"
+
+output:
+  - purged_fa:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*purged.fa":
+          type: file
+          description: Purged assembly with duplicates removed
+          pattern: "*purged.fa"
+  - haplotigs_fa:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*haplotigs.fa":
+          type: file
+          description: Haplotigs removed from assembly
+          pattern: "*haplotigs.fa"
+  - dups_bed:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.bed":
+          type: file
+          description: BED file with duplicate regions
+          pattern: "*.bed"
+  - coverage:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "PB.base.cov":
+          type: file
+          description: Base coverage file
+          pattern: "PB.base.cov"
+  - cutoffs:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - cutoffs:
+          type: file
+          description: Coverage cutoffs file
+          pattern: "cutoffs"
+  - summary:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*_summary.txt":
+          type: file
+          description: Summary statistics
+          pattern: "*_summary.txt"
+  - versions:
+      - versions.yml:
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
+
+authors:
+  - "@seqeraai"
+maintainers:
+  - "@seqeraai"

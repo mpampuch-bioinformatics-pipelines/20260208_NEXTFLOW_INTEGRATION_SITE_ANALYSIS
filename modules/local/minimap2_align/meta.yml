@@ -1,0 +1,44 @@
+name: minimap2_align
+description: Align sequences using minimap2 and output PAF format
+keywords:
+  - alignment
+  - paf
+  - minimap2
+tools:
+  - minimap2:
+      description: A versatile pairwise aligner for genomic and spliced nucleotide sequences
+      homepage: https://github.com/lh3/minimap2
+      documentation: https://github.com/lh3/minimap2#uguide
+      tool_dev_url: https://github.com/lh3/minimap2
+      doi: "10.1093/bioinformatics/bty191"
+      licence: ['MIT']
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [id: 'sample1']
+  - reference:
+      type: file
+      description: Reference genome FASTA file
+      pattern: "*.{fasta,fa,fna}"
+  - query:
+      type: file
+      description: Query sequences to align
+      pattern: "*.{fasta,fa,fna}"
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [id: 'sample1']
+  - paf:
+      type: file
+      description: Minimap2 alignment in PAF format
+      pattern: "*.paf"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@username"

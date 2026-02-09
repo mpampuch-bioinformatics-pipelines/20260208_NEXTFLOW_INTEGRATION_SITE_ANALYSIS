@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "hifiasm"
+description: Haplotype-resolved de novo assembler for PacBio HiFi reads
+keywords:
+  - assembly
+  - hifi
+  - pacbio
+  - genome
+tools:
+  - "hifiasm":
+      description: "Haplotype-resolved de novo assembler for PacBio HiFi reads"
+      homepage: "https://github.com/chhylp123/hifiasm"
+      documentation: "https://hifiasm.readthedocs.io/"
+      tool_dev_url: "https://github.com/chhylp123/hifiasm"
+      doi: "10.1038/s41592-020-01056-5"
+      licence: "['MIT']"
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - reads:
+        type: file
+        description: PacBio HiFi reads in FASTQ format
+        pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+
+output:
+  - primary_gfa:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.p_ctg.gfa":
+          type: file
+          description: Primary contig assembly graph
+          pattern: "*.p_ctg.gfa"
+  - alternate_gfa:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.a_ctg.gfa":
+          type: file
+          description: Alternate contig assembly graph
+          pattern: "*.a_ctg.gfa"
+  - primary_unitigs:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.p_utg.gfa":
+          type: file
+          description: Primary unitigs graph
+          pattern: "*.p_utg.gfa"
+  - reads_unitigs:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.r_utg.gfa":
+          type: file
+          description: Reads unitigs graph
+          pattern: "*.r_utg.gfa"
+  - corrected_reads:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.ec.bin":
+          type: file
+          description: Error-corrected reads
+          pattern: "*.ec.bin"
+  - overlaps:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.ovlp.*.bin":
+          type: file
+          description: Read overlaps
+          pattern: "*.ovlp.*.bin"
+  - log:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*.log":
+          type: file
+          description: HiFiASM log file
+          pattern: "*.log"
+  - versions:
+      - versions.yml:
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
+
+authors:
+  - "@seqeraai"
+maintainers:
+  - "@seqeraai"
