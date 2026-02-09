@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/nf-core/pipeline/master/assets/schema_input.json",
+  "title": "nf-core/pipeline pipeline - params.input schema",
+  "description": "Schema for the samplesheet provided with params.input (strain, reads). PacBio HiFi single-file format.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "strain": {
+        "type": "string",
+        "pattern": "^\\S+$",
+        "errorMessage": "Strain/sample name must be provided and cannot contain spaces",
+        "meta": ["id"]
+      },
+      "reads": {
+        "type": "string",
+        "format": "file-path",
+        "exists": true,
+        "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q$",
+        "errorMessage": "Reads file must be provided, cannot contain spaces; allowed extensions: .fastq or .fq (no .gz)"
+      }
+    },
+    "required": ["strain", "reads"]
+  }
+}

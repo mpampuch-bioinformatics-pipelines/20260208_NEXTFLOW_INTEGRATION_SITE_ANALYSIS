@@ -1,0 +1,131 @@
+nextflow_process {
+
+    name "Test Process HIFIASM"
+    script "../main.nf"
+    process "HIFIASM"
+    tag "modules"
+    tag "modules_nfcore"
+    tag "hifiasm"
+
+    test("hifiasm - basic assembly") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ], // meta map
+                    file(params.test_data['test_fastq'], checkIfExists: true)
+                ]
+                input[1] = [[id: 'empty'], []]  // paternal/maternal kmer dumps
+                input[2] = [[id: 'empty'], []]  // Hi-C reads
+                input[3] = [[id: 'empty'], []]  // bin files
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.raw_unitigs,
+                    process.out.log,
+                    process.out.versions
+                ).match() }
+            )
+        }
+
+    }
+
+    test("hifiasm - basic assembly - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file(params.test_data['test_fastq'], checkIfExists: true)
+                ]
+                input[1] = [[id: 'empty'], []]
+                input[2] = [[id: 'empty'], []]
+                input[3] = [[id: 'empty'], []]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("hifiasm - with ultralong reads") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    [
+                        file(params.test_data['test_fastq'], checkIfExists: true),
+                        file(params.test_data['test_fastq'], checkIfExists: true)
+                    ]
+                ]
+                input[1] = [[id: 'empty'], []]
+                input[2] = [[id: 'empty'], []]
+                input[3] = [[id: 'empty'], []]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.raw_unitigs,
+                    process.out.log,
+                    process.out.versions
+                ).match() }
+            )
+        }
+
+    }
+
+    test("hifiasm - basic assembly with params") {
+
+        config "./nextflow.config"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file(params.test_data['test_fastq'], checkIfExists: true)
+                ]
+                input[1] = [[id: 'empty'], []]
+                input[2] = [[id: 'empty'], []]
+                input[3] = [[id: 'empty'], []]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.raw_unitigs,
+                    process.out.primary_contigs,
+                    process.out.alternate_contigs,
+                    process.out.log,
+                    process.out.versions
+                ).match() }
+            )
+        }
+
+    }
+
+}

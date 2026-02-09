@@ -1,0 +1,130 @@
+nextflow_process {
+
+    name "Test Process GFA2FA"
+    script "../main.nf"
+    process "GFA2FA"
+    tag "modules"
+    tag "modules_local"
+    tag "gfa2fa"
+
+    test("gfa2fa - convert gfa to fasta") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file(params.test_data['test_gfa'], checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.fasta,
+                    process.out.versions
+                ).match() }
+            )
+        }
+
+    }
+
+    test("gfa2fa - convert gfa to fasta - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ],
+                    file(params.test_data['test_gfa'], checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("gfa2fa - primary contigs") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_primary' ],
+                    file(params.test_data['test_gfa'], checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.fasta).match() }
+            )
+        }
+
+    }
+
+    test("gfa2fa - alternate contigs") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_alternate' ],
+                    file(params.test_data['test_gfa'], checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.fasta).match() }
+            )
+        }
+
+    }
+
+    test("gfa2fa - haplotype contigs") {
+
+        config "./nextflow.config"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_hap' ],
+                    file(params.test_data['test_gfa'], checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.fasta,
+                    process.out.versions
+                ).match() }
+            )
+        }
+
+    }
+
+}

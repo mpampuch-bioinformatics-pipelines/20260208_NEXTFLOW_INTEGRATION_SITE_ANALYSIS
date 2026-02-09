@@ -1,0 +1,123 @@
+nextflow_workflow {
+
+    name "Test Workflow PIPELINE"
+    script "../pipeline.nf"
+    workflow "PIPELINE"
+
+    tag "workflows"
+    tag "workflows/pipeline"
+    tag "assembly"
+    tag "multiqc"
+
+    test("homo_sapiens - pacbio - complete pipeline") {
+
+        when {
+            workflow {
+                """
+                input[0] = [
+                    [ id:'test_pipeline', single_end:false ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/fastq/test_hifi.fastq.gz', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.primary_assemblies,
+                    workflow.out.alternate_assemblies,
+                    workflow.out.versions
+                ).match() },
+                // Verify assembly outputs
+                { assert workflow.out.primary_assemblies },
+                { assert workflow.out.alternate_assemblies },
+                { assert workflow.out.assembly_logs },
+                // Verify MultiQC report
+                { assert workflow.out.multiqc_report },
+                { assert workflow.out.multiqc_report.size() > 0 }
+            )
+        }
+    }
+
+    test("homo_sapiens - pacbio - check multiqc generation") {
+
+        when {
+            workflow {
+                """
+                input[0] = [
+                    [ id:'test_multiqc' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/fastq/test_hifi.fastq.gz', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // Verify MultiQC report exists and has content
+                { assert workflow.out.multiqc_report },
+                { assert workflow.out.multiqc_report.get(0) },
+                { assert file(workflow.out.multiqc_report.get(0)).exists() },
+                { assert file(workflow.out.multiqc_report.get(0)).name.endsWith('.html') }
+            )
+        }
+    }
+
+    test("homo_sapiens - pacbio - multiple samples") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.from([
+                    [ id:'sample1' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/fastq/test_hifi.fastq.gz', checkIfExists: true)
+                ],
+                [
+                    [ id:'sample2' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/fastq/alz.ccs.fastq', checkIfExists: true)
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.primary_assemblies,
+                    workflow.out.alternate_assemblies
+                ).match() },
+                // Verify we get outputs for all samples
+                { assert workflow.out.primary_assemblies.size() >= 2 },
+                { assert workflow.out.alternate_assemblies.size() >= 2 }
+            )
+        }
+    }
+
+    test("homo_sapiens - pacbio - versions collection") {
+
+        when {
+            workflow {
+                """
+                input[0] = [
+                    [ id:'test_versions' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/fastq/test_hifi.fastq.gz', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // Verify version tracking
+                { assert workflow.out.versions },
+                { assert workflow.out.versions.size() > 0 },
+                { assert snapshot(workflow.out.versions).match() }
+            )
+        }
+    }
+}
