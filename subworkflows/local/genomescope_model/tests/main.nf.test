@@ -1,0 +1,115 @@
+// TODO nf-core: Once you have added the required tests, please run the following command to build this file:
+// nf-core subworkflows test genomescope_model
+nextflow_workflow {
+
+    name "Test Subworkflow GENOMESCOPE_MODEL"
+    script "../main.nf"
+    workflow "GENOMESCOPE_MODEL"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/genomescope_model"
+    // TODO nf-core: Add tags for all modules used within this subworkflow
+
+    // TODO nf-core: Change the test name preferably indicating the test-data and file-format used
+    test("galderia_gt20kb_50x - non-trio - no mat reads - no pat reads") {
+
+        when {
+            workflow {
+                """
+                // TODO nf-core: define inputs of the workflow here. Example:
+                input[0] = [
+                    [ id:'Galderia_gt20kb_50x', single_end:false ], // meta map
+                    ['/ibex/project/c2303/20251019_Galdi-T2T-Assembly/OUTPUTS/20251023_155416/Galderia_sulphuria_GT20KBreads_50x.fastq.gz', checkIfExists: true)]
+                ]
+                input[1] = [
+                    [ id:'Galderia_gt20kb_50x' ],
+                    []
+                ]
+                input[2] = [
+                    [ id:'Galderia_gt20kb_50x' ],
+                    []
+                ]
+                input[3] = Channel.value('non_trio')
+                """
+
+                
+            }
+        }
+
+        then {            
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.hist,
+                    workflow.out.ktab,
+                    workflow.out.model,
+                    workflow.out.smu,
+                    workflow.out.txt,
+                    workflow.out.nanoplot_txt,
+                    workflow.out.versions,
+                ).match() 
+                },
+                {
+                    with(workflow.out.pdf) {
+                        assert size() == 1  // Check we have one sample
+                        with(get(0)) {
+                            assert get(0).id == 'Galderia_gt20kb_50x'  // Check meta
+                            with(get(1)) {  // Check files
+                                assert get(0) ==~ /.*Galderia_gt20kb_50x_centralities\.pdf.*/
+                                assert get(1) ==~ /.*Galderia_gt20kb_50x_smudgeplot\.pdf.*/
+                                assert get(2) ==~ /.*Galderia_gt20kb_50x_smudgeplot_log10\.pdf.*/
+                            }
+                        }
+                    }
+                },
+                {
+                    // Test NanoPlot HTML output
+                    with(workflow.out.nanoplot_html) {
+                        println "workflow.out.nanoplot_html: " + workflow.out.nanoplot_html
+                        assert size() == 1  // Check we have one sample
+                        with(get(0)) {
+                            assert get(0).id == 'Galderia_gt20kb_50x'  // Check meta
+                            with(get(1)) {  // Check HTML files
+                                assert get(0) ==~ /.*LengthvsQualityScatterPlot_dot\.html.*/
+                                assert get(1) ==~ /.*LengthvsQualityScatterPlot_kde\.html.*/
+                                assert get(2) ==~ /.*NanoPlot-report\.html.*/
+                                assert get(3) ==~ /.*Non_weightedHistogramReadlength\.html.*/
+                                assert get(4) ==~ /.*Non_weightedLogTransformed_HistogramReadlength\.html.*/
+                                assert get(5) ==~ /.*WeightedHistogramReadlength\.html.*/
+                                assert get(6) ==~ /.*WeightedLogTransformed_HistogramReadlength\.html.*/
+                                assert get(7) ==~ /.*Yield_By_Length\.html.*/
+                            }
+                            
+                        }
+                    }
+                },
+                // {
+                //     // Test NanoPlot TXT output
+                //     with(workflow.out.nanoplot_txt) {
+                //         println "workflow.out.nanoplot_txt: " + workflow.out.nanoplot_txt
+                //         println "workflow.out.nanoplot_txt.get(0): " + workflow.out.nanoplot_txt.get(0)
+                //         println "workflow.out.nanoplot_txt.get(0).get(0): " + workflow.out.nanoplot_txt.get(0).get(0)
+                //         println "workflow.out.nanoplot_txt.get(0).get(1): " + workflow.out.nanoplot_txt.get(0).get(1)
+                //         println "workflow.out.nanoplot_txt.get(0).get(1): file name " + file(workflow.out.nanoplot_txt.get(0).get(1)).name
+                //         assert size() == 1  // Check we have one sample
+                //         with(get(0)) {
+                //             assert get(0).id == 'Galderia_gt20kb_50x'  // Check meta
+                //             with(get(1)) {  // Check TXT file
+                //                 assert file(it).name == 'NanoStats.txt'
+                //                 assert file(it).readLines().size() > 1  // File should have content
+                //             }
+                //         }
+                //     }
+                // },
+                { assert workflow.out.matdb.flatten().isEmpty() },
+                { assert workflow.out.mhapktab.flatten().isEmpty() },
+                { assert workflow.out.patdb.flatten().isEmpty() },
+                { assert workflow.out.phapktab.flatten().isEmpty() },
+                { assert workflow.out.tsv.flatten().isEmpty() }
+
+                //TODO nf-core: Add all required assertions to verify the test output.
+            )
+        }
+    }
+}

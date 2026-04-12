@@ -1,4 +1,4 @@
-strain,reads
+strain,reads,blast_queries,reference_genome
 cmc_084_1,/ibex/project/c2303/ALL-BCL-SEQ-READS/BCLCustomers/lauersk/Revio/r84180_20260202_132551/1_A01/version_01/cmc_084_1_C.merolae/cmc_084_1_C.merolae.hifi_reads.fastq
 cmc_084_2,/ibex/project/c2303/ALL-BCL-SEQ-READS/BCLCustomers/lauersk/Revio/r84180_20260202_132551/1_A01/version_01/cmc_084_2_C.merolae/cmc_084_2_C.merolae.hifi_reads.fastq
 cmc_084_3,/ibex/project/c2303/ALL-BCL-SEQ-READS/BCLCustomers/lauersk/Revio/r84180_20260202_132551/1_A01/version_01/cmc_084_3_C.merolae/cmc_084_3_C.merolae.hifi_reads.fastq
